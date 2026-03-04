@@ -14,14 +14,21 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-  const { signup } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const { signUp } = useAuth();
   const navigate = useNavigate();
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    signup({ name, email, phone, role, password });
-    toast.success("تم إنشاء الحساب بنجاح!");
-    navigate("/dashboard");
+    setLoading(true);
+    const { error } = await signUp(email, password, { name, phone, user_type: role });
+    setLoading(false);
+    if (error) {
+      toast.error(error.message || "حدث خطأ أثناء التسجيل");
+    } else {
+      toast.success("تم إنشاء الحساب بنجاح!");
+      navigate("/dashboard");
+    }
   };
 
   return (
@@ -37,10 +44,8 @@ const Signup = () => {
 
         {step === "choose" ? (
           <div className="space-y-4">
-            <button
-              onClick={() => { setRole("student"); setStep("form"); }}
-              className="w-full bg-card/80 backdrop-blur border border-border rounded-2xl p-6 flex items-center gap-4 card-hover border-glow text-right"
-            >
+            <button onClick={() => { setRole("student"); setStep("form"); }}
+              className="w-full bg-card/80 backdrop-blur border border-border rounded-2xl p-6 flex items-center gap-4 card-hover border-glow text-right">
               <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                 <GraduationCap className="w-7 h-7 text-primary" />
               </div>
@@ -49,10 +54,8 @@ const Signup = () => {
                 <p className="text-sm text-muted-foreground">الوصول للملازم والمصادر الدراسية</p>
               </div>
             </button>
-            <button
-              onClick={() => { setRole("engineer"); setStep("form"); }}
-              className="w-full bg-card/80 backdrop-blur border border-border rounded-2xl p-6 flex items-center gap-4 card-hover border-glow text-right"
-            >
+            <button onClick={() => { setRole("engineer"); setStep("form"); }}
+              className="w-full bg-card/80 backdrop-blur border border-border rounded-2xl p-6 flex items-center gap-4 card-hover border-glow text-right">
               <div className="w-14 h-14 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
                 <HardHat className="w-7 h-7 text-accent" />
               </div>
@@ -88,10 +91,12 @@ const Signup = () => {
             </div>
             <div className="space-y-2">
               <Label>رمز الحساب (كلمة المرور)</Label>
-              <Input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required className="bg-secondary/50 border-border" dir="ltr" />
+              <Input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} className="bg-secondary/50 border-border" dir="ltr" />
             </div>
             <div className="flex gap-3">
-              <Button type="submit" variant="glow" className="flex-1" size="lg">إنشاء حساب</Button>
+              <Button type="submit" variant="glow" className="flex-1" size="lg" disabled={loading}>
+                {loading ? "جاري التسجيل..." : "إنشاء حساب"}
+              </Button>
               <Button type="button" variant="outline" onClick={() => setStep("choose")}>رجوع</Button>
             </div>
           </form>

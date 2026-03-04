@@ -10,16 +10,20 @@ import { toast } from "sonner";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const { signIn } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (login(email, password)) {
+    setLoading(true);
+    const { error } = await signIn(email, password);
+    setLoading(false);
+    if (error) {
+      toast.error("البريد أو كلمة المرور غير صحيحة");
+    } else {
       toast.success("تم تسجيل الدخول بنجاح!");
       navigate("/dashboard");
-    } else {
-      toast.error("البريد أو كلمة المرور غير صحيحة");
     }
   };
 
@@ -33,7 +37,6 @@ const Login = () => {
           <h1 className="text-2xl font-bold font-orbitron text-glow text-primary mb-2">تسجيل الدخول</h1>
           <p className="text-muted-foreground">أدخل بياناتك للمتابعة</p>
         </div>
-
         <form onSubmit={handleLogin} className="bg-card/80 backdrop-blur border border-border rounded-2xl p-8 space-y-5 border-glow">
           <div className="space-y-2">
             <Label>البريد الإلكتروني</Label>
@@ -43,8 +46,8 @@ const Login = () => {
             <Label>كلمة المرور</Label>
             <Input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required className="bg-secondary/50 border-border" dir="ltr" />
           </div>
-          <Button type="submit" variant="glow" className="w-full" size="lg">
-            دخول <ArrowRight className="w-4 h-4 mr-2" />
+          <Button type="submit" variant="glow" className="w-full" size="lg" disabled={loading}>
+            {loading ? "جاري الدخول..." : "دخول"} <ArrowRight className="w-4 h-4 mr-2" />
           </Button>
           <p className="text-center text-sm text-muted-foreground">
             ليس لديك حساب؟{" "}
