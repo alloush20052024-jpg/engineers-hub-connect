@@ -1,0 +1,9 @@
+{
+  "appId": "app.lovable.4445302cd6c64b089b7a1920a5782a57",
+  "appName": "مكتبتي الهندسية",
+  "webDir": "dist",
+  "server": {
+    "url": "https://4445302c-d6c6-4b08-9b7a-1920a5782a57.lovableproject.com?forceHideBadge=true",
+    "cleartext": true
+  }
+}
