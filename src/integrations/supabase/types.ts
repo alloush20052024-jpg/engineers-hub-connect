@@ -82,6 +82,44 @@ export type Database = {
         }
         Relationships: []
       }
+      jobs: {
+        Row: {
+          company_name: string
+          contact_info: string | null
+          created_at: string
+          department_id: string
+          description: string | null
+          id: string
+          sort_order: number
+        }
+        Insert: {
+          company_name: string
+          contact_info?: string | null
+          created_at?: string
+          department_id: string
+          description?: string | null
+          id?: string
+          sort_order?: number
+        }
+        Update: {
+          company_name?: string
+          contact_info?: string | null
+          created_at?: string
+          department_id?: string
+          description?: string | null
+          id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jobs_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       parts: {
         Row: {
           created_at: string
