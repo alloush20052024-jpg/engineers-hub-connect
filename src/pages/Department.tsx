@@ -5,15 +5,17 @@ import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { getIcon } from "@/lib/icons";
-import { ArrowRight, BookOpen, Wrench, ShoppingBag, MessageCircle, ExternalLink, Phone, Loader2 } from "lucide-react";
+import { ArrowRight, BookOpen, Wrench, ShoppingBag, MessageCircle, ExternalLink, Phone, Loader2, Briefcase } from "lucide-react";
 
-type Tab = "theory" | "practical" | "shop" | "consult";
+type Tab = "theory" | "practical" | "shop" | "consult" | "jobs" | "eng_shop" | "eng_consult";
 
 const Department = () => {
   const { id: slug } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<Tab>("theory");
+  const { user, profile } = useAuth();
+  const [activeTab, setActiveTab] = useState<Tab | null>(null);
+
+  const isEngineer = profile?.user_type === "engineer";
 
   const { data: dept, isLoading: deptLoading } = useQuery({
     queryKey: ["department", slug],
@@ -32,7 +34,7 @@ const Department = () => {
       if (error) throw error;
       return data;
     },
-    enabled: !!dept?.id,
+    enabled: !!dept?.id && !isEngineer,
   });
 
   const { data: parts } = useQuery({
@@ -42,7 +44,7 @@ const Department = () => {
       if (error) throw error;
       return data;
     },
-    enabled: !!dept?.id,
+    enabled: !!dept?.id && !isEngineer,
   });
 
   const { data: shopItems } = useQuery({
@@ -64,6 +66,25 @@ const Department = () => {
     enabled: !!dept?.id,
   });
 
+  const { data: jobs } = useQuery({
+    queryKey: ["jobs", dept?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("jobs").select("*").eq("department_id", dept!.id).order("sort_order");
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!dept?.id && isEngineer,
+  });
+
+  // Set default tab based on user type
+  if (activeTab === null && profile) {
+    if (isEngineer) {
+      setActiveTab("jobs");
+    } else {
+      setActiveTab("theory");
+    }
+  }
+
   if (deptLoading) {
     return <div className="min-h-screen flex items-center justify-center bg-background"><Loader2 className="w-8 h-8 text-primary animate-spin" /></div>;
   }
@@ -72,12 +93,20 @@ const Department = () => {
 
   const Icon = getIcon(dept.icon);
 
-  const tabs: { key: Tab; label: string; icon: any }[] = [
+  const studentTabs: { key: Tab; label: string; icon: any }[] = [
     { key: "theory", label: "هندسة نظري", icon: BookOpen },
     { key: "practical", label: "هندسة عملي", icon: Wrench },
     { key: "shop", label: "تسوق", icon: ShoppingBag },
     { key: "consult", label: "استشارة هندسية", icon: MessageCircle },
   ];
+
+  const engineerTabs: { key: Tab; label: string; icon: any }[] = [
+    { key: "jobs", label: "وظائف", icon: Briefcase },
+    { key: "eng_shop", label: "سوق هندسي", icon: ShoppingBag },
+    { key: "eng_consult", label: "استشاري", icon: MessageCircle },
+  ];
+
+  const tabs = isEngineer ? engineerTabs : studentTabs;
 
   return (
     <div className="min-h-screen grid-pattern">
@@ -110,6 +139,7 @@ const Department = () => {
           ))}
         </div>
 
+        {/* Student Tabs */}
         {activeTab === "theory" && (
           <div>
             <h2 className="text-2xl font-bold text-foreground mb-6">الملازم والمصادر المعتمدة</h2>
@@ -197,6 +227,80 @@ const Department = () => {
             </p>
             <div className="bg-card/80 backdrop-blur border border-border rounded-2xl p-6 mb-6 border-glow">
               <div className="text-3xl font-bold text-accent mb-2">{Number(consultSettings?.price || 25000).toLocaleString()} د.ع</div>
+              <p className="text-sm text-muted-foreground">رسوم الاستشارة الواحدة</p>
+            </div>
+            <div className="space-y-3">
+              <Button variant="hero" size="lg" className="w-full"><Phone className="w-5 h-5" /> الدفع عبر زين كاش</Button>
+              <Button variant="glow" size="lg" className="w-full"><Phone className="w-5 h-5" /> الدفع عبر آسياسيل كاش</Button>
+            </div>
+          </div>
+        )}
+
+        {/* Engineer Tabs */}
+        {activeTab === "jobs" && (
+          <div>
+            <h2 className="text-2xl font-bold text-foreground mb-6">وظائف هندسية - شركات تحتاج مهندسين</h2>
+            {(!jobs || jobs.length === 0) ? (
+              <p className="text-muted-foreground text-center py-10">لا توجد وظائف متاحة حالياً لهذا القسم</p>
+            ) : (
+              <div className="grid gap-4">
+                {jobs.map(job => (
+                  <div key={job.id} className="bg-card/80 backdrop-blur border border-border rounded-xl p-5 card-hover border-glow">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <Briefcase className="w-6 h-6 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-foreground text-lg">{job.company_name}</h3>
+                        {job.description && <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{job.description}</p>}
+                        {job.contact_info && (
+                          <p className="text-sm text-primary mt-2">📞 {job.contact_info}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === "eng_shop" && (
+          <div>
+            <h2 className="text-2xl font-bold text-foreground mb-6">السوق الهندسي</h2>
+            {(!shopItems || shopItems.length === 0) ? (
+              <p className="text-muted-foreground text-center py-10">لا توجد منتجات بعد لهذا القسم</p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {shopItems.map(item => (
+                  <div key={item.id} className="bg-card/80 backdrop-blur border border-border rounded-xl overflow-hidden card-hover border-glow">
+                    {item.image_url && <img src={item.image_url} alt={item.name} className="w-full h-40 object-cover opacity-80" />}
+                    <div className="p-5">
+                      <h3 className="font-bold text-foreground mb-1">{item.name}</h3>
+                      <p className="text-sm text-muted-foreground mb-3">{item.description}</p>
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-accent">{Number(item.price).toLocaleString()} د.ع</span>
+                        <Button variant="glow" size="sm"><ShoppingBag className="w-4 h-4" /> شراء</Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === "eng_consult" && (
+          <div className="max-w-lg mx-auto text-center py-10">
+            <div className="w-20 h-20 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center mx-auto mb-6 animate-pulse-glow">
+              <MessageCircle className="w-10 h-10 text-primary" />
+            </div>
+            <h2 className="text-2xl font-bold text-foreground mb-4">استشاري هندسي متخصص</h2>
+            <p className="text-muted-foreground mb-8 leading-relaxed">
+              احصل على استشارة هندسية احترافية من مهندس موقع متخصص في {dept.name}. يتم الدفع عبر زين كاش أو آسياسيل كاش.
+            </p>
+            <div className="bg-card/80 backdrop-blur border border-border rounded-2xl p-6 mb-6 border-glow">
+              <div className="text-3xl font-bold text-accent mb-2">400,000 د.ع</div>
               <p className="text-sm text-muted-foreground">رسوم الاستشارة الواحدة</p>
             </div>
             <div className="space-y-3">
