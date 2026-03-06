@@ -226,6 +226,10 @@ const Signup = () => {
                   <Textarea value={companyDesc} onChange={e => setCompanyDesc(e.target.value)} placeholder="نبذة عن شركتك" className="bg-secondary/50 border-border" />
                 </div>
                 <div className="space-y-2">
+                  <Label>سند تسجيل الشركة (إثبات التسجيل) *</Label>
+                  <Input type="file" accept="image/*,.pdf" onChange={e => setCompanyRegDoc(e.target.files?.[0] || null)} required className="bg-secondary/50 border-border" />
+                </div>
+                <div className="space-y-2">
                   <Label>شعار الشركة (اختياري)</Label>
                   <Input type="file" accept="image/*" onChange={e => setCompanyLogo(e.target.files?.[0] || null)} className="bg-secondary/50 border-border" />
                 </div>
