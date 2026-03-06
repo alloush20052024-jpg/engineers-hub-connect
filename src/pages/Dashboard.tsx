@@ -4,7 +4,7 @@ import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { getIcon } from "@/lib/icons";
-import { LogOut, Settings, Zap, Loader2 } from "lucide-react";
+import { LogOut, Settings, Zap, Loader2, Building2 } from "lucide-react";
 import { useEffect } from "react";
 
 const Dashboard = () => {
