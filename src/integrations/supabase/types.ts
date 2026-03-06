@@ -172,6 +172,7 @@ export type Database = {
           description: string | null
           id: string
           sort_order: number
+          user_id: string | null
         }
         Insert: {
           company_name: string
@@ -181,6 +182,7 @@ export type Database = {
           description?: string | null
           id?: string
           sort_order?: number
+          user_id?: string | null
         }
         Update: {
           company_name?: string
@@ -190,6 +192,7 @@ export type Database = {
           description?: string | null
           id?: string
           sort_order?: number
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -318,6 +321,7 @@ export type Database = {
           name: string
           price: number
           sort_order: number
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -329,6 +333,7 @@ export type Database = {
           name: string
           price?: number
           sort_order?: number
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -340,6 +345,7 @@ export type Database = {
           name?: string
           price?: number
           sort_order?: number
+          user_id?: string | null
         }
         Relationships: [
           {
