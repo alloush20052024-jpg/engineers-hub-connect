@@ -17,7 +17,7 @@ const Admin = () => {
   const { user, isAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [activeSection, setActiveSection] = useState<"departments" | "resources" | "parts" | "shop">("departments");
+  const [activeSection, setActiveSection] = useState<"departments" | "resources" | "parts" | "shop" | "consultants">("departments");
 
   // Dialog states
   const [dialogOpen, setDialogOpen] = useState(false);
