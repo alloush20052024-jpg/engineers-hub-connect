@@ -72,6 +72,16 @@ const Admin = () => {
     enabled: !!user && activeSection === "shop",
   });
 
+  const { data: consultantApps } = useQuery({
+    queryKey: ["admin-consultants"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("consultant_applications").select("*").order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user && activeSection === "consultants",
+  });
+
   if (authLoading) {
     return <div className="min-h-screen flex items-center justify-center bg-background"><Loader2 className="w-8 h-8 text-primary animate-spin" /></div>;
   }
