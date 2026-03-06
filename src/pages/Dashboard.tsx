@@ -4,7 +4,7 @@ import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { getIcon } from "@/lib/icons";
-import { LogOut, Settings, Zap, Loader2 } from "lucide-react";
+import { LogOut, Settings, Zap, Loader2, Building2 } from "lucide-react";
 import { useEffect } from "react";
 
 const Dashboard = () => {
@@ -45,6 +45,11 @@ const Dashboard = () => {
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-muted-foreground">مرحباً، {profile?.name || "مستخدم"}</span>
+            {profile?.user_type === "company" && (
+              <Button variant="outline" size="sm" onClick={() => navigate("/company")}>
+                <Building2 className="w-4 h-4" /> إدارة شركتي
+              </Button>
+            )}
             {isAdmin && (
               <Button variant="outline" size="sm" onClick={() => navigate("/admin")}>
                 <Settings className="w-4 h-4" /> لوحة التحكم
