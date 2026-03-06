@@ -45,6 +45,11 @@ const Dashboard = () => {
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-muted-foreground">مرحباً، {profile?.name || "مستخدم"}</span>
+            {profile?.user_type === "company" && (
+              <Button variant="outline" size="sm" onClick={() => navigate("/company")}>
+                <Building2 className="w-4 h-4" /> إدارة شركتي
+              </Button>
+            )}
             {isAdmin && (
               <Button variant="outline" size="sm" onClick={() => navigate("/admin")}>
                 <Settings className="w-4 h-4" /> لوحة التحكم
