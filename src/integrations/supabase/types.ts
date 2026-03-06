@@ -14,6 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
+      company_profiles: {
+        Row: {
+          company_name: string
+          contact_info: string | null
+          created_at: string
+          description: string | null
+          id: string
+          logo_url: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          company_name: string
+          contact_info?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          company_name?: string
+          contact_info?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      consultant_applications: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          email: string
+          face_photo_url: string | null
+          id: string
+          phone: string
+          residence_card_url: string | null
+          status: string
+          unified_card_url: string | null
+          union_id_url: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          email: string
+          face_photo_url?: string | null
+          id?: string
+          phone: string
+          residence_card_url?: string | null
+          status?: string
+          unified_card_url?: string | null
+          union_id_url?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          email?: string
+          face_photo_url?: string | null
+          id?: string
+          phone?: string
+          residence_card_url?: string | null
+          status?: string
+          unified_card_url?: string | null
+          union_id_url?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       consultation_settings: {
         Row: {
           contact_info: string | null

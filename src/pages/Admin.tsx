@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getIcon, iconMap } from "@/lib/icons";
-import { ArrowRight, Zap, Plus, Trash2, Settings, BookOpen, Wrench, ShoppingBag, Loader2, X, Edit } from "lucide-react";
+import { ArrowRight, Zap, Plus, Trash2, Settings, BookOpen, Wrench, ShoppingBag, Loader2, X, Edit, ShieldCheck, Check, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -17,7 +17,7 @@ const Admin = () => {
   const { user, isAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [activeSection, setActiveSection] = useState<"departments" | "resources" | "parts" | "shop">("departments");
+  const [activeSection, setActiveSection] = useState<"departments" | "resources" | "parts" | "shop" | "consultants">("departments");
 
   // Dialog states
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -70,6 +70,16 @@ const Admin = () => {
       return data;
     },
     enabled: !!user && activeSection === "shop",
+  });
+
+  const { data: consultantApps } = useQuery({
+    queryKey: ["admin-consultants"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("consultant_applications").select("*").order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user && activeSection === "consultants",
   });
 
   if (authLoading) {
@@ -186,11 +196,23 @@ const Admin = () => {
     }
   };
 
+  const handleConsultantAction = async (id: string, status: "approved" | "rejected") => {
+    try {
+      const { error } = await supabase.from("consultant_applications").update({ status }).eq("id", id);
+      if (error) throw error;
+      queryClient.invalidateQueries({ queryKey: ["admin-consultants"] });
+      toast.success(status === "approved" ? "تم قبول الطلب" : "تم رفض الطلب");
+    } catch (err: any) {
+      toast.error(err.message || "حدث خطأ");
+    }
+  };
+
   const sections = [
     { key: "departments" as const, label: "الأقسام", icon: Settings },
     { key: "resources" as const, label: "المصادر النظرية", icon: BookOpen },
     { key: "parts" as const, label: "القطع العملية", icon: Wrench },
     { key: "shop" as const, label: "المتجر", icon: ShoppingBag },
+    { key: "consultants" as const, label: "طلبات الاستشاريين", icon: ShieldCheck },
   ];
 
   const renderDeptSelect = () => (
@@ -372,6 +394,60 @@ const Admin = () => {
                 </div>
               ))}
               {(!shopItems || shopItems.length === 0) && <p className="text-muted-foreground text-center py-10">لا توجد منتجات بعد</p>}
+            </div>
+          </div>
+        )}
+        {/* Consultant Applications */}
+        {activeSection === "consultants" && (
+          <div>
+            <h2 className="text-2xl font-bold text-foreground mb-6">طلبات المهندسين الاستشاريين</h2>
+            <div className="grid gap-4">
+              {consultantApps?.map(app => (
+                <div key={app.id} className="bg-card/80 border border-border rounded-xl p-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <p className="font-bold text-foreground">{app.email}</p>
+                      <p className="text-sm text-muted-foreground">{app.phone} • {new Date(app.created_at).toLocaleDateString("ar-IQ")}</p>
+                    </div>
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      app.status === "pending" ? "bg-amber-500/20 text-amber-400" :
+                      app.status === "approved" ? "bg-green-500/20 text-green-400" :
+                      "bg-red-500/20 text-red-400"
+                    }`}>
+                      {app.status === "pending" ? "قيد المراجعة" : app.status === "approved" ? "مقبول" : "مرفوض"}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                    {[
+                      { label: "هوية النقابة", url: app.union_id_url },
+                      { label: "البطاقة الموحدة", url: app.unified_card_url },
+                      { label: "بطاقة السكن", url: app.residence_card_url },
+                      { label: "صورة الوجه", url: app.face_photo_url },
+                    ].map((doc, i) => (
+                      <a key={i} href={doc.url || "#"} target="_blank" rel="noopener noreferrer"
+                        className="block bg-secondary/50 rounded-lg p-2 text-center hover:bg-secondary/80 transition">
+                        {doc.url ? (
+                          <img src={doc.url} alt={doc.label} className="w-full h-20 object-cover rounded mb-1" />
+                        ) : (
+                          <div className="w-full h-20 bg-muted rounded mb-1 flex items-center justify-center text-muted-foreground text-xs">لا يوجد</div>
+                        )}
+                        <p className="text-xs text-muted-foreground">{doc.label}</p>
+                      </a>
+                    ))}
+                  </div>
+                  {app.status === "pending" && (
+                    <div className="flex gap-2">
+                      <Button variant="default" size="sm" onClick={() => handleConsultantAction(app.id, "approved")} className="bg-green-600 hover:bg-green-700">
+                        <Check className="w-4 h-4" /> قبول
+                      </Button>
+                      <Button variant="destructive" size="sm" onClick={() => handleConsultantAction(app.id, "rejected")}>
+                        <XCircle className="w-4 h-4" /> رفض
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              ))}
+              {(!consultantApps || consultantApps.length === 0) && <p className="text-muted-foreground text-center py-10">لا توجد طلبات بعد</p>}
             </div>
           </div>
         )}
