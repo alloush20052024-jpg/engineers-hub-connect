@@ -33,6 +33,7 @@ const Signup = () => {
   const [companyName, setCompanyName] = useState("");
   const [companyDesc, setCompanyDesc] = useState("");
   const [companyLogo, setCompanyLogo] = useState<File | null>(null);
+  const [companyRegDoc, setCompanyRegDoc] = useState<File | null>(null);
 
   const uploadFile = async (file: File, folder: string, userId: string) => {
     const ext = file.name.split(".").pop();
