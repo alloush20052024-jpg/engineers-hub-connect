@@ -100,12 +100,14 @@ const Signup = () => {
         if (companyLogo) {
           logoUrl = await uploadFile(companyLogo, "company-logos", userId);
         }
+        const regDocUrl = await uploadFile(companyRegDoc!, "company-docs", userId);
 
         await supabase.from("company_profiles").insert({
           user_id: userId,
           company_name: companyName,
           description: companyDesc,
           logo_url: logoUrl,
+          registration_doc_url: regDocUrl,
           contact_info: phone,
         });
 
