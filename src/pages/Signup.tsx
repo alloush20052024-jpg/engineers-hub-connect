@@ -33,6 +33,7 @@ const Signup = () => {
   const [companyName, setCompanyName] = useState("");
   const [companyDesc, setCompanyDesc] = useState("");
   const [companyLogo, setCompanyLogo] = useState<File | null>(null);
+  const [companyRegDoc, setCompanyRegDoc] = useState<File | null>(null);
 
   const uploadFile = async (file: File, folder: string, userId: string) => {
     const ext = file.name.split(".").pop();
@@ -57,8 +58,8 @@ const Signup = () => {
         }
       }
 
-      if (role === "company" && !companyName.trim()) {
-        toast.error("يرجى إدخال اسم الشركة");
+      if (role === "company" && (!companyName.trim() || !companyRegDoc)) {
+        toast.error("يرجى إدخال اسم الشركة ورفع سند تسجيل الشركة");
         setLoading(false);
         return;
       }
@@ -99,12 +100,14 @@ const Signup = () => {
         if (companyLogo) {
           logoUrl = await uploadFile(companyLogo, "company-logos", userId);
         }
+        const regDocUrl = await uploadFile(companyRegDoc!, "company-docs", userId);
 
         await supabase.from("company_profiles").insert({
           user_id: userId,
           company_name: companyName,
           description: companyDesc,
           logo_url: logoUrl,
+          registration_doc_url: regDocUrl,
           contact_info: phone,
         });
 
@@ -221,6 +224,10 @@ const Signup = () => {
                 <div className="space-y-2">
                   <Label>وصف الشركة</Label>
                   <Textarea value={companyDesc} onChange={e => setCompanyDesc(e.target.value)} placeholder="نبذة عن شركتك" className="bg-secondary/50 border-border" />
+                </div>
+                <div className="space-y-2">
+                  <Label>سند تسجيل الشركة (إثبات التسجيل) *</Label>
+                  <Input type="file" accept="image/*,.pdf" onChange={e => setCompanyRegDoc(e.target.files?.[0] || null)} required className="bg-secondary/50 border-border" />
                 </div>
                 <div className="space-y-2">
                   <Label>شعار الشركة (اختياري)</Label>
