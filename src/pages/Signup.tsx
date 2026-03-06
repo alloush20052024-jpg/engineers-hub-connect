@@ -58,8 +58,8 @@ const Signup = () => {
         }
       }
 
-      if (role === "company" && !companyName.trim()) {
-        toast.error("يرجى إدخال اسم الشركة");
+      if (role === "company" && (!companyName.trim() || !companyRegDoc)) {
+        toast.error("يرجى إدخال اسم الشركة ورفع سند تسجيل الشركة");
         setLoading(false);
         return;
       }
