@@ -82,6 +82,16 @@ const Admin = () => {
     enabled: !!user && activeSection === "consultants",
   });
 
+  const { data: companyApps } = useQuery({
+    queryKey: ["admin-companies"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("company_profiles").select("*").order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user && activeSection === "companies",
+  });
+
   if (authLoading) {
     return <div className="min-h-screen flex items-center justify-center bg-background"><Loader2 className="w-8 h-8 text-primary animate-spin" /></div>;
   }
