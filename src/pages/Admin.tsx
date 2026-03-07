@@ -455,6 +455,7 @@ const Admin = () => {
                         )}
                         <p className="text-xs text-muted-foreground">{doc.label}</p>
                       </a>
+                    ))}
                   </div>
                   {app.status === "pending" && (
                     <div className="flex gap-2">
