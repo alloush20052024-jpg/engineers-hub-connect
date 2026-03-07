@@ -68,7 +68,9 @@ const CompanyDashboard = () => {
     enabled: !!user,
   });
 
-  const isApproved = companyProfile?.status === "approved";
+  if (authLoading) {
+    return <div className="min-h-screen flex items-center justify-center bg-background"><Loader2 className="w-8 h-8 text-primary animate-spin" /></div>;
+  }
 
   if (!isApproved) {
     return (
@@ -86,8 +88,6 @@ const CompanyDashboard = () => {
         </div>
       </div>
     );
-  }
-    return <div className="min-h-screen flex items-center justify-center bg-background"><Loader2 className="w-8 h-8 text-primary animate-spin" /></div>;
   }
 
   const openAdd = (type: "job" | "product") => {
