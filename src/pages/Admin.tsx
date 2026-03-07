@@ -456,16 +456,61 @@ const Admin = () => {
                         <p className="text-xs text-muted-foreground">{doc.label}</p>
                       </a>
                     ))}
+        {/* Company Applications */}
+        {activeSection === "companies" && (
+          <div>
+            <h2 className="text-2xl font-bold text-foreground mb-6">طلبات الشركات ومراجعة سند التسجيل</h2>
+            <div className="grid gap-4">
+              {companyApps?.map(company => (
+                <div key={company.id} className="bg-card/80 border border-border rounded-xl p-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-4">
+                      {company.logo_url && <img src={company.logo_url} alt={company.company_name} className="w-14 h-14 rounded-lg object-cover border border-border" />}
+                      <div>
+                        <h3 className="font-bold text-foreground text-lg">{company.company_name}</h3>
+                        <p className="text-sm text-muted-foreground">{company.contact_info} • {new Date(company.created_at).toLocaleDateString("ar-IQ")}</p>
+                        {company.description && <p className="text-sm text-muted-foreground mt-1">{company.description}</p>}
+                      </div>
+                    </div>
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      company.status === "pending" ? "bg-amber-500/20 text-amber-400" :
+                      company.status === "approved" ? "bg-green-500/20 text-green-400" :
+                      "bg-red-500/20 text-red-400"
+                    }`}>
+                      {company.status === "pending" ? "قيد المراجعة" : company.status === "approved" ? "مقبولة" : "مرفوضة"}
+                    </span>
                   </div>
-                  {app.status === "pending" && (
+                  <div className="mb-4">
+                    <p className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2"><FileText className="w-4 h-4" /> سند تسجيل الشركة:</p>
+                    {company.registration_doc_url ? (
+                      <a href={company.registration_doc_url} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 bg-secondary/50 rounded-lg p-3 hover:bg-secondary/80 transition border border-border">
+                        <img src={company.registration_doc_url} alt="سند التسجيل" className="w-32 h-24 object-cover rounded" />
+                        <span className="text-sm text-primary flex items-center gap-1"><ExternalLink className="w-3 h-3" /> عرض المستند</span>
+                      </a>
+                    ) : (
+                      <p className="text-sm text-destructive">لم يتم رفع سند التسجيل</p>
+                    )}
+                  </div>
+                  {company.status !== "approved" && (
                     <div className="flex gap-2">
-                      <Button variant="default" size="sm" onClick={() => handleConsultantAction(app.id, "approved")} className="bg-green-600 hover:bg-green-700">
+                      <Button variant="default" size="sm" onClick={() => handleCompanyAction(company.id, "approved")} className="bg-green-600 hover:bg-green-700">
                         <Check className="w-4 h-4" /> قبول
                       </Button>
-                      <Button variant="destructive" size="sm" onClick={() => handleConsultantAction(app.id, "rejected")}>
-                        <XCircle className="w-4 h-4" /> رفض
-                      </Button>
+                      {company.status !== "rejected" && (
+                        <Button variant="destructive" size="sm" onClick={() => handleCompanyAction(company.id, "rejected")}>
+                          <XCircle className="w-4 h-4" /> رفض
+                        </Button>
+                      )}
                     </div>
+                  )}
+                </div>
+              ))}
+              {(!companyApps || companyApps.length === 0) && <p className="text-muted-foreground text-center py-10">لا توجد طلبات شركات بعد</p>}
+            </div>
+          </div>
+        )}
+      </div>
                   )}
                 </div>
               ))}
