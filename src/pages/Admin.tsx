@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getIcon, iconMap } from "@/lib/icons";
-import { ArrowRight, Zap, Plus, Trash2, Settings, BookOpen, Wrench, ShoppingBag, Loader2, X, Edit, ShieldCheck, Check, XCircle } from "lucide-react";
+import { ArrowRight, Zap, Plus, Trash2, Settings, BookOpen, Wrench, ShoppingBag, Loader2, X, Edit, ShieldCheck, Check, XCircle, Building2, FileText, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
