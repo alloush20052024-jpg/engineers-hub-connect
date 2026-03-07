@@ -70,7 +70,23 @@ const CompanyDashboard = () => {
 
   const isApproved = companyProfile?.status === "approved";
 
-  if (authLoading) {
+  if (!isApproved) {
+    return (
+      <div className="min-h-screen grid-pattern flex items-center justify-center">
+        <div className="bg-card/80 border border-border rounded-xl p-8 text-center max-w-md">
+          <Building2 className="w-16 h-16 text-amber-500 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-foreground mb-2">حسابك قيد المراجعة</h2>
+          <p className="text-muted-foreground mb-4">يتم مراجعة سند تسجيل شركتك من قبل الإدارة. ستتمكن من إضافة الوظائف والمنتجات بعد الموافقة.</p>
+          <span className="inline-block px-4 py-2 rounded-full text-sm font-semibold bg-amber-500/20 text-amber-400">
+            {companyProfile?.status === "rejected" ? "مرفوض - تواصل مع الإدارة" : "قيد المراجعة"}
+          </span>
+          <Button variant="ghost" className="mt-4 w-full" onClick={() => navigate("/dashboard")}>
+            <ArrowRight className="w-4 h-4" /> العودة للرئيسية
+          </Button>
+        </div>
+      </div>
+    );
+  }
     return <div className="min-h-screen flex items-center justify-center bg-background"><Loader2 className="w-8 h-8 text-primary animate-spin" /></div>;
   }
 
