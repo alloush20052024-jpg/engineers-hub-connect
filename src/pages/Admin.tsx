@@ -455,7 +455,24 @@ const Admin = () => {
                         )}
                         <p className="text-xs text-muted-foreground">{doc.label}</p>
                       </a>
-                    ))}
+                  </div>
+                  {app.status === "pending" && (
+                    <div className="flex gap-2">
+                      <Button variant="default" size="sm" onClick={() => handleConsultantAction(app.id, "approved")} className="bg-green-600 hover:bg-green-700">
+                        <Check className="w-4 h-4" /> قبول
+                      </Button>
+                      <Button variant="destructive" size="sm" onClick={() => handleConsultantAction(app.id, "rejected")}>
+                        <XCircle className="w-4 h-4" /> رفض
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              ))}
+              {(!consultantApps || consultantApps.length === 0) && <p className="text-muted-foreground text-center py-10">لا توجد طلبات بعد</p>}
+            </div>
+          </div>
+        )}
+
         {/* Company Applications */}
         {activeSection === "companies" && (
           <div>
@@ -507,14 +524,6 @@ const Admin = () => {
                 </div>
               ))}
               {(!companyApps || companyApps.length === 0) && <p className="text-muted-foreground text-center py-10">لا توجد طلبات شركات بعد</p>}
-            </div>
-          </div>
-        )}
-      </div>
-                  )}
-                </div>
-              ))}
-              {(!consultantApps || consultantApps.length === 0) && <p className="text-muted-foreground text-center py-10">لا توجد طلبات بعد</p>}
             </div>
           </div>
         )}
