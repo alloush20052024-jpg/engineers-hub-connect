@@ -217,12 +217,24 @@ const Admin = () => {
     }
   };
 
+  const handleCompanyAction = async (id: string, status: "approved" | "rejected") => {
+    try {
+      const { error } = await supabase.from("company_profiles").update({ status }).eq("id", id);
+      if (error) throw error;
+      queryClient.invalidateQueries({ queryKey: ["admin-companies"] });
+      toast.success(status === "approved" ? "تم قبول الشركة" : "تم رفض الشركة");
+    } catch (err: any) {
+      toast.error(err.message || "حدث خطأ");
+    }
+  };
+
   const sections = [
     { key: "departments" as const, label: "الأقسام", icon: Settings },
     { key: "resources" as const, label: "المصادر النظرية", icon: BookOpen },
     { key: "parts" as const, label: "القطع العملية", icon: Wrench },
     { key: "shop" as const, label: "المتجر", icon: ShoppingBag },
     { key: "consultants" as const, label: "طلبات الاستشاريين", icon: ShieldCheck },
+    { key: "companies" as const, label: "طلبات الشركات", icon: Building2 },
   ];
 
   const renderDeptSelect = () => (
