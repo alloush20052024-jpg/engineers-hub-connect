@@ -49,17 +49,9 @@ const Signup = () => {
     setLoading(true);
 
     try {
-      // For consultant, validate required files
-      if (role === "consultant") {
-        if (!unionIdFile || !unifiedCardFile || !residenceCardFile || !facePhoto) {
-          toast.error("يرجى رفع جميع الوثائق المطلوبة والتقاط صورة الوجه");
-          setLoading(false);
-          return;
-        }
-      }
-
-      if (role === "company" && (!companyName.trim() || !companyRegDoc)) {
-        toast.error("يرجى إدخال اسم الشركة ورفع سند تسجيل الشركة");
+      // Documents are optional for testing
+      if (role === "company" && !companyName.trim()) {
+        toast.error("يرجى إدخال اسم الشركة");
         setLoading(false);
         return;
       }
