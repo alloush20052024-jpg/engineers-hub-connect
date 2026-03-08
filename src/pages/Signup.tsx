@@ -49,17 +49,9 @@ const Signup = () => {
     setLoading(true);
 
     try {
-      // For consultant, validate required files
-      if (role === "consultant") {
-        if (!unionIdFile || !unifiedCardFile || !residenceCardFile || !facePhoto) {
-          toast.error("يرجى رفع جميع الوثائق المطلوبة والتقاط صورة الوجه");
-          setLoading(false);
-          return;
-        }
-      }
-
-      if (role === "company" && (!companyName.trim() || !companyRegDoc)) {
-        toast.error("يرجى إدخال اسم الشركة ورفع سند تسجيل الشركة");
+      // Documents are optional for testing
+      if (role === "company" && !companyName.trim()) {
+        toast.error("يرجى إدخال اسم الشركة");
         setLoading(false);
         return;
       }
@@ -76,31 +68,26 @@ const Signup = () => {
       const userId = session?.user?.id;
 
       if (userId && role === "consultant") {
-        const [unionUrl, unifiedUrl, residenceUrl, faceUrl] = await Promise.all([
-          uploadFile(unionIdFile!, "consultant-docs", userId),
-          uploadFile(unifiedCardFile!, "consultant-docs", userId),
-          uploadFile(residenceCardFile!, "consultant-docs", userId),
-          uploadFile(facePhoto!, "consultant-photos", userId),
-        ]);
+        const uploads: Record<string, string> = {};
+        if (unionIdFile) uploads.union_id_url = await uploadFile(unionIdFile, "consultant-docs", userId);
+        if (unifiedCardFile) uploads.unified_card_url = await uploadFile(unifiedCardFile, "consultant-docs", userId);
+        if (residenceCardFile) uploads.residence_card_url = await uploadFile(residenceCardFile, "consultant-docs", userId);
+        if (facePhoto) uploads.face_photo_url = await uploadFile(facePhoto, "consultant-photos", userId);
 
         await supabase.from("consultant_applications").insert({
           user_id: userId,
-          union_id_url: unionUrl,
-          unified_card_url: unifiedUrl,
-          residence_card_url: residenceUrl,
-          face_photo_url: faceUrl,
           phone,
           email,
+          ...uploads,
         });
 
         toast.success("تم إرسال طلبك! سيتم مراجعته من قبل الإدارة");
         navigate("/dashboard");
       } else if (userId && role === "company") {
         let logoUrl = "";
-        if (companyLogo) {
-          logoUrl = await uploadFile(companyLogo, "company-logos", userId);
-        }
-        const regDocUrl = await uploadFile(companyRegDoc!, "company-docs", userId);
+        let regDocUrl = "";
+        if (companyLogo) logoUrl = await uploadFile(companyLogo, "company-logos", userId);
+        if (companyRegDoc) regDocUrl = await uploadFile(companyRegDoc, "company-docs", userId);
 
         await supabase.from("company_profiles").insert({
           user_id: userId,
@@ -189,7 +176,7 @@ const Signup = () => {
             {/* Consultant extra fields */}
             {role === "consultant" && (
               <div className="space-y-3 border-t border-border pt-4">
-                <p className="text-sm font-semibold text-foreground">الوثائق المطلوبة</p>
+                <p className="text-sm font-semibold text-foreground">الوثائق (اختيارية للتجربة)</p>
 
                 <div className="space-y-2">
                   <Label>هوية النقابة</Label>
@@ -226,8 +213,8 @@ const Signup = () => {
                   <Textarea value={companyDesc} onChange={e => setCompanyDesc(e.target.value)} placeholder="نبذة عن شركتك" className="bg-secondary/50 border-border" />
                 </div>
                 <div className="space-y-2">
-                  <Label>سند تسجيل الشركة (إثبات التسجيل) *</Label>
-                  <Input type="file" accept="image/*,.pdf" onChange={e => setCompanyRegDoc(e.target.files?.[0] || null)} required className="bg-secondary/50 border-border" />
+                  <Label>سند تسجيل الشركة (اختياري للتجربة)</Label>
+                  <Input type="file" accept="image/*,.pdf" onChange={e => setCompanyRegDoc(e.target.files?.[0] || null)} className="bg-secondary/50 border-border" />
                 </div>
                 <div className="space-y-2">
                   <Label>شعار الشركة (اختياري)</Label>
