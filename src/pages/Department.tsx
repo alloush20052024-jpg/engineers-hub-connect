@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { getIcon } from "@/lib/icons";
 import { ArrowRight, BookOpen, Wrench, ShoppingBag, MessageCircle, ExternalLink, Phone, Loader2, Briefcase } from "lucide-react";
+import AITools from "@/components/AITools";
 
 type Tab = "theory" | "practical" | "shop" | "consult" | "jobs" | "eng_shop" | "eng_consult";
 
@@ -310,6 +311,9 @@ const Department = () => {
           </div>
         )}
       </div>
+
+      {/* AI Tools - only for students */}
+      {!isEngineer && <AITools />}
     </div>
   );
 };
