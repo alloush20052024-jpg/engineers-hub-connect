@@ -176,7 +176,7 @@ const Signup = () => {
             {/* Consultant extra fields */}
             {role === "consultant" && (
               <div className="space-y-3 border-t border-border pt-4">
-                <p className="text-sm font-semibold text-foreground">الوثائق المطلوبة</p>
+                <p className="text-sm font-semibold text-foreground">الوثائق (اختيارية للتجربة)</p>
 
                 <div className="space-y-2">
                   <Label>هوية النقابة</Label>
