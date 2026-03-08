@@ -68,31 +68,26 @@ const Signup = () => {
       const userId = session?.user?.id;
 
       if (userId && role === "consultant") {
-        const [unionUrl, unifiedUrl, residenceUrl, faceUrl] = await Promise.all([
-          uploadFile(unionIdFile!, "consultant-docs", userId),
-          uploadFile(unifiedCardFile!, "consultant-docs", userId),
-          uploadFile(residenceCardFile!, "consultant-docs", userId),
-          uploadFile(facePhoto!, "consultant-photos", userId),
-        ]);
+        const uploads: Record<string, string> = {};
+        if (unionIdFile) uploads.union_id_url = await uploadFile(unionIdFile, "consultant-docs", userId);
+        if (unifiedCardFile) uploads.unified_card_url = await uploadFile(unifiedCardFile, "consultant-docs", userId);
+        if (residenceCardFile) uploads.residence_card_url = await uploadFile(residenceCardFile, "consultant-docs", userId);
+        if (facePhoto) uploads.face_photo_url = await uploadFile(facePhoto, "consultant-photos", userId);
 
         await supabase.from("consultant_applications").insert({
           user_id: userId,
-          union_id_url: unionUrl,
-          unified_card_url: unifiedUrl,
-          residence_card_url: residenceUrl,
-          face_photo_url: faceUrl,
           phone,
           email,
+          ...uploads,
         });
 
         toast.success("تم إرسال طلبك! سيتم مراجعته من قبل الإدارة");
         navigate("/dashboard");
       } else if (userId && role === "company") {
         let logoUrl = "";
-        if (companyLogo) {
-          logoUrl = await uploadFile(companyLogo, "company-logos", userId);
-        }
-        const regDocUrl = await uploadFile(companyRegDoc!, "company-docs", userId);
+        let regDocUrl = "";
+        if (companyLogo) logoUrl = await uploadFile(companyLogo, "company-logos", userId);
+        if (companyRegDoc) regDocUrl = await uploadFile(companyRegDoc, "company-docs", userId);
 
         await supabase.from("company_profiles").insert({
           user_id: userId,
