@@ -311,6 +311,9 @@ const Department = () => {
           </div>
         )}
       </div>
+
+      {/* AI Tools - only for students */}
+      {!isEngineer && <AITools />}
     </div>
   );
 };
