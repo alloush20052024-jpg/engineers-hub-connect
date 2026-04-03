@@ -24,3 +24,77 @@
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class TechUIExample extends JFrame {
+    private JPanel mainPanel;
+    private JButton toggleModeButton;
+    private boolean isDarkMode = false;
+
+    public TechUIExample() {
+        setTitle("تطبيق واجهة تقنية");
+        setSize(500, 400);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLocationRelativeTo(null); // في وسط الشاشة
+
+        // إنشاء لوحة رئيسية
+        mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout());
+        setContentPane(mainPanel);
+
+        // إضافة زر التبديل بين النهاري والليلي
+        toggleModeButton = new JButton("تبديل الوضع النهاري/الليلي");
+        toggleModeButton.setFocusPainted(false);
+        toggleModeButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        toggleModeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                toggleTheme();
+            }
+        });
+
+        mainPanel.add(toggleModeButton, BorderLayout.SOUTH);
+
+        // وضع الواجهة النهارية كبداية
+        applyDayMode();
+
+        setVisible(true);
+    }
+
+    // دالة لتبديل الوضع
+    private void toggleTheme() {
+        if (isDarkMode) {
+            applyDayMode();
+        } else {
+            applyNightMode();
+        }
+        isDarkMode = !isDarkMode;
+    }
+
+    // وضع نهاري
+    private void applyDayMode() {
+        mainPanel.setBackground(new Color(245, 245, 245)); // رمادي فاتح
+        toggleModeButton.setBackground(new Color(30, 144, 255)); // أزرق تقني
+        toggleModeButton.setForeground(Color.WHITE);
+    }
+
+    // وضع ليلي
+    private void applyNightMode() {
+        mainPanel.setBackground(new Color(18, 18, 18)); // أسود شبه كامل
+        toggleModeButton.setBackground(new Color(72, 61, 139)); // أرجواني غامق تقني
+        toggleModeButton.setForeground(Color.WHITE);
+    }
+
+    public static void main(String[] args) {
+        // جعل الواجهة تعمل بشكل سلس
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new TechUIExample();
+            }
+        });
+    }
+}
